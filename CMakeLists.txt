@@ -17,6 +17,9 @@ SET(POLYQUAD_VERSION "${POLYQUAD_VERSION_MAJOR}.${POLYQUAD_VERSION_MINOR}")
 # Source files
 ##################################################
 SET(POLYQUAD_HEADERS
+    src/dispatcher.hpp
+    src/dispatcher_map.hpp
+    src/dispatcher_instances/instances.hpp
     src/actions/eval.hpp
     src/actions/expand.hpp
     src/actions/find.hpp
@@ -32,12 +35,18 @@ SET(POLYQUAD_HEADERS
     src/utils/eigen_addons.hpp
     src/utils/ortho_poly.hpp
     src/utils/serialization.hpp
-    src/utils/timer.hpp)
+    src/utils/timer.hpp
+)
+
+SET(POLYQUAD_SOURCES 
+  src/dispatcher_map.cpp
+  src/dispatcher_instances/tri_double.cpp
+)
 
 ##################################################
 # Executable
 ##################################################
-ADD_EXECUTABLE(polyquad src/main.cpp ${POLYQUAD_HEADERS})
+ADD_EXECUTABLE(polyquad src/main.cpp ${POLYQUAD_SOURCES} ${POLYQUAD_HEADERS})
 
 ##################################################
 # Internal includes, these must come before the
@@ -89,7 +98,7 @@ STRING(REPLACE ";" " " CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS}")
 # C++17
 ##################################################
 IF(UNIX)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wno-deprecated")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++23 -Wno-deprecated")
 ENDIF()
 
 ##################################################

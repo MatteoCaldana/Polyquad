@@ -42,6 +42,7 @@
 #include <tuple>
 #include <utility>
 #include <vector>
+#include <list>
 
 namespace polyquad {
 

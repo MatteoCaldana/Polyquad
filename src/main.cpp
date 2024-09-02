@@ -29,6 +29,7 @@
 #include "shapes/pri.hpp"
 #include "shapes/pyr.hpp"
 #include "utils/io.hpp"
+#include "dispatcher_map.hpp"
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
@@ -42,49 +43,13 @@
 #include <string>
 #include <vector>
 
-namespace mp = boost::multiprecision;
-namespace po = boost::program_options;
+
 using namespace polyquad;
-
-template<template<typename> class Domain, typename T>
-void process_dispatch(const po::variables_map& vm)
-{
-    const std::string& action = vm["action"].as<std::string>();
-
-    if (action == "find")
-        process_find<Domain, T>(vm);
-    else if (action == "iterate")
-        process_iterate<Domain, T>(vm);
-    else if (action == "eval")
-        process_eval<Domain, T>(vm);
-    else if (action == "expand")
-        process_expand<Domain, T>(vm);
-}
 
 int main(int argc, const char *argv[])
 {
-    typedef mp::cpp_bin_float_100 bfloat;
-    typedef std::pair<std::string, std::string> shape_key;
-    typedef void (*process_fn)(const po::variables_map&);
-
-    std::map<shape_key, process_fn> shape_disp =
-    {
-        { {"tri",  "double"}, &process_dispatch<TriDomain,  double> },
-        { {"quad", "double"}, &process_dispatch<QuadDomain, double> },
-        { {"hex",  "double"}, &process_dispatch<HexDomain,  double> },
-        { {"tet",  "double"}, &process_dispatch<TetDomain,  double> },
-        { {"pri",  "double"}, &process_dispatch<PriDomain,  double> },
-        { {"pyr",  "double"}, &process_dispatch<PyrDomain,  double> },
-        { {"tri",  "bfloat"}, &process_dispatch<TriDomain,  bfloat> },
-        { {"quad", "bfloat"}, &process_dispatch<QuadDomain, bfloat> },
-        { {"hex",  "bfloat"}, &process_dispatch<HexDomain,  bfloat> },
-        { {"tet",  "bfloat"}, &process_dispatch<TetDomain,  bfloat> },
-        { {"pri",  "bfloat"}, &process_dispatch<PriDomain,  bfloat> },
-        { {"pyr",  "bfloat"}, &process_dispatch<PyrDomain,  bfloat> },
-    };
-
     std::set<std::string> shapes, dtypes;
-    for (const auto& it : shape_disp)
+    for (const auto& it : ShapeDispatcherMap::map)
     {
         shapes.insert(it.first.first);
         dtypes.insert(it.first.second);
@@ -216,7 +181,7 @@ int main(int argc, const char *argv[])
             }
 
             // Dispatch
-            shape_disp[{shape, dtype}](vm);
+            ShapeDispatcherMap::map[{shape, dtype}](vm);
         }
         else
         {
